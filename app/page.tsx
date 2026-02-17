@@ -53,7 +53,7 @@ export default function Home() {
           boxShadow: '0 4px 14px rgba(13, 122, 95, 0.25)',
           transition: 'transform 0.2s ease'
         }}>
-          Terus ke Login/Daftar→
+          Terus ke Login/Daftar →
         </Link>
         
         <p style={{ fontSize: '13px', color: '#888', marginTop: '8px' }}>

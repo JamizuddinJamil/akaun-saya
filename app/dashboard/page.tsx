@@ -371,17 +371,27 @@ export default async function Dashboard() {
 
       </div>
 
-      {/* FAB */}
+{/* FAB */}
       <Link href="/tambah" style={{
         position: 'fixed', bottom: '80px', right: '20px',
         width: '56px', height: '56px', borderRadius: '50%',
         background: 'linear-gradient(135deg, #0d7a5f, #0a5f4a)',
-        color: 'white', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: '28px', fontWeight: 300,
-        textDecoration: 'none', zIndex: 20,
-        boxShadow: '0 4px 20px rgba(13,122,95,0.45)'
+        color: 'white', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        zIndex: 20,
+        boxShadow: '0 4px 20px rgba(13,122,95,0.45)',
+        textDecoration: 'none',
       }}>
-        +
+        <span style={{ 
+          fontSize: '32px', 
+          fontWeight: '400', 
+          lineHeight: 1, 
+          marginTop: '-4px' // Tweak kecil untuk betulkan optik alignment
+        }}>
+          +
+        </span>
       </Link>
 
       {/* Bottom nav */}
