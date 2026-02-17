@@ -342,50 +342,6 @@ export default async function Dashboard() {
           )}
         </div>
 
-{/* Business Health Bar — Minimalist Tracker */}
-<div style={{
-  background: 'white',
-  borderRadius: '20px',
-  padding: '16px',
-  boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-}}>
-  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '10px' }}>
-    <div>
-      <p style={{ fontSize: '9px', fontWeight: 700, color: '#888', letterSpacing: '1px', textTransform: 'uppercase' }}>
-        Jualan (Purata)
-      </p>
-      <p style={{ fontSize: '16px', fontWeight: 800, color: '#0f1f1a', marginTop: '2px' }}>
-        RM {toRM(totalIncome / now.getDate())} <span style={{ fontSize: '11px', fontWeight: 400, color: '#888' }}>/ hari</span>
-      </p>
-    </div>
-    <div style={{ textAlign: 'right' }}>
-      <p style={{ fontSize: '10px', fontWeight: 700, color: '#0d7a5f' }}>
-        Hari {now.getDate()} / {new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}
-      </p>
-    </div>
-  </div>
-
-  {/* Progress Bar (Time Progress) */}
-  <div style={{ 
-    height: '6px', 
-    background: '#f0f0f0', 
-    borderRadius: '10px', 
-    overflow: 'hidden' 
-  }}>
-    <div style={{
-      height: '100%',
-      width: `${(now.getDate() / new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()) * 100}%`,
-      background: 'linear-gradient(90deg, #0d7a5f, #2ecc71)',
-      borderRadius: '10px',
-      transition: 'width 1s ease'
-    }} />
-  </div>
-
-  <p style={{ fontSize: '10px', color: '#888', marginTop: '8px', fontStyle: 'italic' }}>
-    Target: Kekalkan purata untuk capai RM {toRM((totalIncome / now.getDate()) * new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate())} bulan ini.
-  </p>
-</div>
-
       </div>
 
 {/* FAB */}
