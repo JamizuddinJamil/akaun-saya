@@ -297,8 +297,8 @@ J: Semak folder **Spam/Junk** dalam emel anda. Kalau masih tiada, cuba daftar se
 
 Ada masalah atau cadangan? Hubungi kami:
 
-- 📱 WhatsApp: *(nombor support)*
-- 📧 Emel: *(emel support)*
+- 📱 WhatsApp: *017-7547847*
+- 📧 Emel: *abdjamizuddin@gmail.com*
 
 ---
 
