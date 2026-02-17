@@ -32,7 +32,8 @@ export default function AddExpenseForm({ categories }: Props) {
   const [saving,     setSaving]     = useState(false)
   const [error,      setError]      = useState<string | null>(null)
 
-  const fileRef = useRef<HTMLInputElement>(null)
+  const cameraRef  = useRef<HTMLInputElement>(null)
+  const galleryRef = useRef<HTMLInputElement>(null)
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -50,6 +51,9 @@ export default function AddExpenseForm({ categories }: Props) {
       setError(err.message ?? 'Gagal muat naik resit')
     } finally {
       setUploading(false)
+      // Reset input so same file can be selected again
+      if (cameraRef.current)  cameraRef.current.value  = ''
+      if (galleryRef.current) galleryRef.current.value = ''
     }
   }
 
@@ -105,45 +109,143 @@ export default function AddExpenseForm({ categories }: Props) {
 
       {/* Receipt upload */}
       <div>
-        <p style={{ fontSize: '11px', fontWeight: 700, color: '#888', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
+        <p style={{
+          fontSize: '11px', fontWeight: 700, color: '#888',
+          letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px'
+        }}>
           Resit (Pilihan)
         </p>
+
         {receiptUrl ? (
+          // Receipt uploaded — show success state with replace options
           <div style={{
-            display: 'flex', alignItems: 'center', gap: '12px',
             background: '#e6f5f1', border: '1.5px solid #b2dfdb',
             borderRadius: '16px', padding: '14px'
           }}>
-            <span style={{ fontSize: '24px' }}>✅</span>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0f1f1a' }}>Resit disimpan</p>
-              <p style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>Tekan untuk tukar</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '24px' }}>✅</span>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '13px', fontWeight: 700, color: '#0f1f1a' }}>
+                  Resit berjaya disimpan
+                </p>
+                <p style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>
+                  Nak tukar? Pilih semula di bawah
+                </p>
+              </div>
             </div>
-            <button onClick={() => fileRef.current?.click()} style={{
-              background: 'none', border: 'none', color: '#0d7a5f',
-              fontWeight: 700, fontSize: '12px', cursor: 'pointer'
-            }}>Tukar</button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => cameraRef.current?.click()}
+                disabled={uploading}
+                style={{
+                  flex: 1, padding: '8px', border: '1.5px solid #b2dfdb',
+                  borderRadius: '10px', background: 'white', cursor: 'pointer',
+                  fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif',
+                  color: '#0d7a5f', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', gap: '4px'
+                }}
+              >
+                📷 Kamera
+              </button>
+              <button
+                onClick={() => galleryRef.current?.click()}
+                disabled={uploading}
+                style={{
+                  flex: 1, padding: '8px', border: '1.5px solid #b2dfdb',
+                  borderRadius: '10px', background: 'white', cursor: 'pointer',
+                  fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif',
+                  color: '#0d7a5f', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', gap: '4px'
+                }}
+              >
+                🖼️ Galeri
+              </button>
+              <button
+                onClick={() => setReceiptUrl(null)}
+                style={{
+                  padding: '8px 12px', border: '1.5px solid #fca5a5',
+                  borderRadius: '10px', background: 'white', cursor: 'pointer',
+                  fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif',
+                  color: '#dc2626'
+                }}
+              >
+                🗑️
+              </button>
+            </div>
           </div>
         ) : (
-          <button onClick={() => fileRef.current?.click()} disabled={uploading} style={{
-            width: '100%', border: '2px dashed #b2dfdb', borderRadius: '16px',
-            padding: '24px', background: '#f0faf7', cursor: 'pointer',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px'
-          }}>
-            <span style={{ fontSize: '32px' }}>{uploading ? '⏳' : '📷'}</span>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#0d7a5f' }}>
-              {uploading ? 'Sedang muat naik...' : 'Ambil gambar resit'}
-            </span>
-            <span style={{ fontSize: '11px', color: '#888' }}>JPG atau PNG, maksimum 5MB</span>
-          </button>
+          // No receipt — show two upload buttons
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {/* Camera button */}
+            <button
+              onClick={() => cameraRef.current?.click()}
+              disabled={uploading}
+              style={{
+                flex: 1, border: '2px dashed #b2dfdb', borderRadius: '16px',
+                padding: '20px 8px', background: '#f0faf7', cursor: uploading ? 'not-allowed' : 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                gap: '6px', opacity: uploading ? 0.6 : 1
+              }}
+            >
+              <span style={{ fontSize: '28px' }}>
+                {uploading ? '⏳' : '📷'}
+              </span>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0d7a5f' }}>
+                {uploading ? 'Uploading...' : 'Kamera'}
+              </span>
+              <span style={{ fontSize: '10px', color: '#888' }}>
+                Snap terus
+              </span>
+            </button>
+
+            {/* Gallery button */}
+            <button
+              onClick={() => galleryRef.current?.click()}
+              disabled={uploading}
+              style={{
+                flex: 1, border: '2px dashed #b2dfdb', borderRadius: '16px',
+                padding: '20px 8px', background: '#f0faf7', cursor: uploading ? 'not-allowed' : 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                gap: '6px', opacity: uploading ? 0.6 : 1
+              }}
+            >
+              <span style={{ fontSize: '28px' }}>🖼️</span>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0d7a5f' }}>
+                Galeri
+              </span>
+              <span style={{ fontSize: '10px', color: '#888' }}>
+                Dari telefon
+              </span>
+            </button>
+          </div>
         )}
-        <input ref={fileRef} type="file" accept="image/*" capture="environment"
-          onChange={handleUpload} style={{ display: 'none' }} />
+
+        {/* Camera input — opens camera directly */}
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={handleUpload}
+          style={{ display: 'none' }}
+        />
+
+        {/* Gallery input — opens gallery */}
+        <input
+          ref={galleryRef}
+          type="file"
+          accept="image/*"
+          onChange={handleUpload}
+          style={{ display: 'none' }}
+        />
       </div>
 
       {/* Amount */}
       <div>
-        <p style={{ fontSize: '11px', fontWeight: 700, color: '#888', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
+        <p style={{
+          fontSize: '11px', fontWeight: 700, color: '#888',
+          letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px'
+        }}>
           Jumlah (RM)
         </p>
         <div style={{
@@ -167,7 +269,10 @@ export default function AddExpenseForm({ categories }: Props) {
 
       {/* Categories */}
       <div>
-        <p style={{ fontSize: '11px', fontWeight: 700, color: '#888', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
+        <p style={{
+          fontSize: '11px', fontWeight: 700, color: '#888',
+          letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px'
+        }}>
           Kategori
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
@@ -195,23 +300,32 @@ export default function AddExpenseForm({ categories }: Props) {
 
       {/* Date */}
       <div>
-        <p style={{ fontSize: '11px', fontWeight: 700, color: '#888', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
+        <p style={{
+          fontSize: '11px', fontWeight: 700, color: '#888',
+          letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px'
+        }}>
           Tarikh
         </p>
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{
-          width: '100%', padding: '12px 16px', fontSize: '14px', fontWeight: 600,
-          border: '2px solid #e8eeec', borderRadius: '14px', outline: 'none',
-          background: 'white', fontFamily: 'sans-serif', color: '#0f1f1a'
-        }} />
+        <input
+          type="date" value={date} onChange={e => setDate(e.target.value)}
+          style={{
+            width: '100%', padding: '12px 16px', fontSize: '14px', fontWeight: 600,
+            border: '2px solid #e8eeec', borderRadius: '14px', outline: 'none',
+            background: 'white', fontFamily: 'sans-serif', color: '#0f1f1a'
+          }}
+        />
       </div>
 
       {/* Note */}
       <div>
-        <p style={{ fontSize: '11px', fontWeight: 700, color: '#888', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
+        <p style={{
+          fontSize: '11px', fontWeight: 700, color: '#888',
+          letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px'
+        }}>
           Nota (Pilihan)
         </p>
         <textarea
-          placeholder="Contoh: 'Bayar sewa kedai untuk bulan April/ Majlis kenduri keluarga'"
+          placeholder="Contoh: 'Bayar sewa kedai untuk bulan April / Majlis kenduri keluarga'"
           value={note} onChange={e => setNote(e.target.value)}
           maxLength={500} rows={3}
           style={{
