@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import LaporanClient from '@/components/LaporanClient'
 
+export const dynamic = 'force-dynamic'
 export default async function LaporanPage({
   searchParams,
 }: {
@@ -267,10 +268,10 @@ export default async function LaporanPage({
         display: 'flex', padding: '10px 0 20px'
       }}>
         {[
-          { href: '/dashboard', icon: '🏠', label: 'Utama', active: true },
-          { href: '/tambah',    icon: '➕', label: 'Tambah' },
-          { href: '/laporan',   icon: '📊', label: 'Laporan' },
-          { href: '/tetapan',   icon: '⚙️', label: 'Tetapan' },
+{ href: '/dashboard', icon: '🏠', label: 'Utama' },
+{ href: '/tambah',    icon: '➕', label: 'Tambah' },
+{ href: '/laporan',   icon: '📊', label: 'Laporan', active: true },
+{ href: '/tetapan',   icon: '⚙️', label: 'Tetapan' },
         ].map(item => (
           <Link key={item.href} href={item.href} style={{
             flex: 1, display: 'flex', flexDirection: 'column',

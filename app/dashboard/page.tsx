@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import SwipeableTransaction from '@/components/SwipeableTransaction'
 
+
+export const dynamic = 'force-dynamic'
 export default async function Dashboard() {
   // 1. Get logged in user
   const supabase = await createClient()
