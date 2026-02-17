@@ -8,7 +8,7 @@ import { NextRequest } from 'next/server'
 
 export async function GET(req: NextRequest) {
   // 1. Auth
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return Response.json({ error: 'Tidak dibenarkan' }, { status: 401 })
