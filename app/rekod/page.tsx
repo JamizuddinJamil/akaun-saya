@@ -67,7 +67,7 @@ export default async function RekodPage({
   return (
     <div style={{
       maxWidth: '430px', margin: '0 auto',
-      padding: '0 16px 100px', fontFamily: 'sans-serif'
+      padding: '0 16px 100px'
     }}>
 
       {/* Header */}
@@ -192,8 +192,8 @@ export default async function RekodPage({
         display: 'flex', padding: '10px 0 20px', zIndex: 10
       }}>
         {[
-          { href: '/dashboard', icon: '🏠', label: 'Utama', active: true },
-          { href: '/tambah',    icon: '➕', label: 'Tambah' },
+{ href: '/dashboard', icon: '🏠', label: 'Utama' },
+          { href: '/rekod',     icon: '📋', label: 'Rekod',   active: true },
           { href: '/laporan',   icon: '📊', label: 'Laporan' },
           { href: '/tetapan',   icon: '⚙️', label: 'Tetapan' },
         ].map(item => (

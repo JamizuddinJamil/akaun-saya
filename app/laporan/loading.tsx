@@ -2,7 +2,7 @@
   return (
     <div style={{
       maxWidth: '430px', margin: '0 auto',
-      padding: '0 16px 100px', fontFamily: 'sans-serif',
+      padding: '0 16px 100px',
       background: '#f5f7f6', minHeight: '100vh'
     }}>
       {/* Header */}

@@ -11,7 +11,7 @@ export default async function TetapanPage() {
   return (
     <div style={{
       maxWidth: '430px', margin: '0 auto',
-      padding: '0 16px 100px', fontFamily: 'sans-serif',
+      padding: '0 16px 100px',
       minHeight: '100vh', position: 'relative'
     }}>
       {/* Header */}
@@ -72,8 +72,8 @@ export default async function TetapanPage() {
         maxWidth: '430px', margin: '0 auto' 
       }}>
         {[
-          { href: '/dashboard', icon: '🏠', label: 'Utama' },
-          { href: '/tambah',    icon: '➕', label: 'Tambah' },
+{ href: '/dashboard', icon: '🏠', label: 'Utama' },
+          { href: '/rekod',     icon: '📋', label: 'Rekod' },
           { href: '/laporan',   icon: '📊', label: 'Laporan' },
           { href: '/tetapan',   icon: '⚙️', label: 'Tetapan', active: true },
         ].map(item => (

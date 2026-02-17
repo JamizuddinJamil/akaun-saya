@@ -6,7 +6,7 @@
       alignItems: 'center',
       justifyContent: 'center',
       height: '100vh',
-      fontFamily: 'sans-serif',
+      ,
       gap: '12px'
     }}>
       <h1>🍽️ Akaunsaya.my</h1>

@@ -40,9 +40,13 @@ export default async function Dashboard() {
   }
   const netProfit  = totalIncome - totalExpense
 
-  // Today's spending
-  const todaySpend = todayTransactions
+// Today's spending & income
+  const todaySpend  = todayTransactions
     .filter(tx => tx.type === 'EXPENSE')
+    .reduce((sum, tx) => sum + tx.amount, 0)
+
+  const todayIncome = todayTransactions
+    .filter(tx => tx.type === 'INCOME')
     .reduce((sum, tx) => sum + tx.amount, 0)
 
   // Top spending category
@@ -75,7 +79,7 @@ export default async function Dashboard() {
   return (
     <div style={{
       maxWidth: '430px', margin: '0 auto',
-      padding: '0 16px 100px', fontFamily: 'sans-serif',
+      padding: '0 16px 100px',
       background: '#f5f7f6', minHeight: '100vh'
     }}>
 
@@ -175,23 +179,50 @@ export default async function Dashboard() {
         {/* 2-col bento row */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
 
-          {/* Today's spending */}
+{/* Today's spending */}
           <div style={{
             background: 'white', borderRadius: '20px',
             padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
           }}>
             <p style={{
               fontSize: '9px', fontWeight: 700, color: '#888',
-              letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px'
+              letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '10px'
             }}>
               📅 HARI INI
             </p>
-            <p style={{ fontSize: '20px', fontWeight: 900, color: '#0f1f1a', marginBottom: '2px' }}>
-              RM {toRM(todaySpend)}
-            </p>
-            <p style={{ fontSize: '10px', color: '#888' }}>
-              {todayTransactions.length} transaksi
-            </p>
+            {/* Income & Expense row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <div>
+                <p style={{ fontSize: '9px', color: '#0d7a5f', fontWeight: 700, marginBottom: '2px' }}>
+                  MASUK
+                </p>
+                <p style={{ fontSize: '12px', fontWeight: 800, color: '#0d7a5f' }}>
+                  +{toRM(todayIncome)}
+                </p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontSize: '9px', color: '#d94f3d', fontWeight: 700, marginBottom: '2px' }}>
+                  KELUAR
+                </p>
+                <p style={{ fontSize: '12px', fontWeight: 800, color: '#d94f3d' }}>
+                  -{toRM(todaySpend)}
+                </p>
+              </div>
+            </div>
+            {/* Divider */}
+            <div style={{ height: '1px', background: '#f0f0f0', marginBottom: '6px' }} />
+            {/* Net */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <p style={{ fontSize: '9px', color: '#888', fontWeight: 700 }}>
+                {todayTransactions.length} transaksi
+              </p>
+              <p style={{
+                fontSize: '12px', fontWeight: 900,
+                color: (todayIncome - todaySpend) >= 0 ? '#0d7a5f' : '#d94f3d'
+              }}>
+                RM {toRM(Math.abs(todayIncome - todaySpend))}
+              </p>
+            </div>
           </div>
 
           {/* Monthly transaction count */}
@@ -362,8 +393,8 @@ export default async function Dashboard() {
         zIndex: 10
       }}>
         {[
-          { href: '/dashboard', icon: '🏠', label: 'Utama',   active: true },
-          { href: '/tambah',    icon: '➕', label: 'Tambah' },
+{ href: '/dashboard', icon: '🏠', label: 'Utama',   active: true },
+          { href: '/rekod',     icon: '📋', label: 'Rekod' },
           { href: '/laporan',   icon: '📊', label: 'Laporan' },
           { href: '/tetapan',   icon: '⚙️', label: 'Tetapan' },
         ].map(item => (

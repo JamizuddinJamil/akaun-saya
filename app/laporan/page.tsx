@@ -80,7 +80,7 @@ export default async function LaporanPage({
   return (
     <div style={{
       maxWidth: '430px', margin: '0 auto',
-      padding: '0 16px 100px', fontFamily: 'sans-serif',
+      padding: '0 16px 100px',
       background: '#f5f7f6', minHeight: '100vh'
     }}>
 
@@ -375,8 +375,8 @@ export default async function LaporanPage({
         zIndex: 10
       }}>
         {[
-          { href: '/dashboard', icon: '🏠', label: 'Utama' },
-          { href: '/tambah',    icon: '➕', label: 'Tambah' },
+{ href: '/dashboard', icon: '🏠', label: 'Utama' },
+          { href: '/rekod',     icon: '📋', label: 'Rekod' },
           { href: '/laporan',   icon: '📊', label: 'Laporan', active: true },
           { href: '/tetapan',   icon: '⚙️', label: 'Tetapan' },
         ].map(item => (

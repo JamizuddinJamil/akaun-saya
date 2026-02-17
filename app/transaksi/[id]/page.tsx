@@ -22,7 +22,7 @@ export default async function TransactionDetailPage({
 
   if (!transaction) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'sans-serif' }}>
+      <div style={{ padding: '40px', textAlign: 'center' }}>
         <p>Transaction not found</p>
         <Link href="/dashboard" style={{ color: '#0d7a5f' }}>Back to Dashboard</Link>
       </div>
@@ -34,7 +34,7 @@ export default async function TransactionDetailPage({
   return (
     <div style={{
       maxWidth: '430px', margin: '0 auto',
-      padding: '0 16px 40px', fontFamily: 'sans-serif'
+      padding: '0 16px 40px'
     }}>
 
       {/* Header */}

@@ -108,7 +108,7 @@ export default function LoginPage() {
               style={{
                 width: '100%', padding: '12px 16px',
                 border: '2px solid #e8eeec', borderRadius: '12px',
-                fontSize: '14px', outline: 'none', fontFamily: 'sans-serif',
+                fontSize: '14px', outline: 'none',
                 background: 'white', cursor: 'pointer'
               }}
             >
@@ -136,7 +136,7 @@ export default function LoginPage() {
             style={{
               width: '100%', padding: '12px 16px',
               border: '2px solid #e8eeec', borderRadius: '12px',
-              fontSize: '14px', outline: 'none', fontFamily: 'sans-serif'
+              fontSize: '14px', outline: 'none'
             }}
           />
         </div>
@@ -157,7 +157,7 @@ export default function LoginPage() {
             style={{
               width: '100%', padding: '12px 16px',
               border: '2px solid #e8eeec', borderRadius: '12px',
-              fontSize: '14px', outline: 'none', fontFamily: 'sans-serif'
+              fontSize: '14px', outline: 'none'
             }}
           />
         </div>
@@ -185,7 +185,7 @@ export default function LoginPage() {
             color: 'white', border: 'none',
             borderRadius: '14px', fontSize: '15px',
             fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer',
-            fontFamily: 'sans-serif'
+            
           }}
         >
           {loading ? '⏳ Tunggu...' : mode === 'login' ? 'Log Masuk' : 'Daftar'}

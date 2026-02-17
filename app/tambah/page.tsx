@@ -44,7 +44,7 @@ if (categories.length === 0) {
       maxWidth: '430px',
       margin: '0 auto',
       padding: '0 16px',
-      fontFamily: 'sans-serif'
+      
     }}>
       {/* Header */}
       <div style={{
