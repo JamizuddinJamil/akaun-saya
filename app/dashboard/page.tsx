@@ -1,163 +1,379 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import SwipeableTransaction from '@/components/SwipeableTransaction'
 
-
-export const dynamic = 'force-dynamic'
 export default async function Dashboard() {
-  // 1. Get logged in user
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // 2. Get current month range
-  const now = new Date()
+  const now       = new Date()
   const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
   const endDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
 
-// 3. Load ALL this month's transactions for correct totals
-const allTransactions = await prisma.transaction.findMany({
-  where: {
-    userId: user.id,
-    date: { gte: startDate, lte: endDate }
-  },
-  include: { category: true },
-  orderBy: { date: 'desc' },
-})
+  // Today range
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const todayEnd   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59)
 
-// 4. Calculate totals from ALL transactions
-let totalIncome  = 0
-let totalExpense = 0
-for (const tx of allTransactions) {
-  if (tx.type === 'INCOME') totalIncome  += tx.amount
-  else                      totalExpense += tx.amount
-}
+  // All this month
+  const allTransactions = await prisma.transaction.findMany({
+    where: { userId: user.id, date: { gte: startDate, lte: endDate } },
+    include: { category: true },
+    orderBy: { date: 'desc' },
+  })
 
-const netProfit = totalIncome - totalExpense
+  // Today's transactions
+  const todayTransactions = allTransactions.filter(tx =>
+    tx.date >= todayStart && tx.date <= todayEnd
+  )
 
-// 5. Only show 5 most recent on dashboard
-const transactions = allTransactions.slice(0, 5)
+  // Totals
+  let totalIncome  = 0
+  let totalExpense = 0
+  for (const tx of allTransactions) {
+    if (tx.type === 'INCOME') totalIncome  += tx.amount
+    else                      totalExpense += tx.amount
+  }
+  const netProfit  = totalIncome - totalExpense
 
-// 6. Format to RM
-const toRM = (sen: number) => (sen / 100).toFixed(2)
+  // Today's spending
+  const todaySpend = todayTransactions
+    .filter(tx => tx.type === 'EXPENSE')
+    .reduce((sum, tx) => sum + tx.amount, 0)
 
-// 7. Month name in BM
-const monthNames = [
+  // Top spending category
+  const categoryMap = new Map<string, { name: string; icon: string; total: number }>()
+  for (const tx of allTransactions) {
+    if (tx.type !== 'EXPENSE') continue
+    const existing = categoryMap.get(tx.categoryId)
+    if (existing) existing.total += tx.amount
+    else categoryMap.set(tx.categoryId, {
+      name: tx.category.name, icon: tx.category.icon, total: tx.amount
+    })
+  }
+  const topCategory = Array.from(categoryMap.values())
+    .sort((a, b) => b.total - a.total)[0] || null
+  const topCategoryPct = topCategory && totalExpense > 0
+    ? Math.round((topCategory.total / totalExpense) * 100) : 0
+
+  // Recent 5
+  const recentTransactions = allTransactions.slice(0, 5)
+
+  const toRM = (sen: number) => (sen / 100).toFixed(2)
+
+  const monthNames = [
     'Januari','Februari','Mac','April','Mei','Jun',
     'Julai','Ogos','September','Oktober','November','Disember'
   ]
   const currentMonth = `${monthNames[now.getMonth()]} ${now.getFullYear()}`
+  const isProfit     = netProfit >= 0
 
   return (
     <div style={{
       maxWidth: '430px', margin: '0 auto',
-      padding: '24px 16px 100px', fontFamily: 'sans-serif'
+      padding: '0 16px 100px', fontFamily: 'sans-serif',
+      background: '#f5f7f6', minHeight: '100vh'
     }}>
 
       {/* Header */}
       <div style={{
         display: 'flex', justifyContent: 'space-between',
-        alignItems: 'center', marginBottom: '20px'
+        alignItems: 'center', padding: '20px 0 16px'
       }}>
         <div>
-          <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#0f1f1a' }}>
+          <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#0f1f1a' }}>
             🧾 AkaunSaya.my
           </h1>
-          <p style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+          <p style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
             {currentMonth}
           </p>
         </div>
-      </div>
-
-      {/* Profit card */}
-      <div style={{
-        background: netProfit >= 0 ? '#0d7a5f' : '#d94f3d',
-        borderRadius: '20px', padding: '20px',
-        color: 'white', marginBottom: '16px'
-      }}>
-        <p style={{ opacity: 0.7, fontSize: '11px', marginBottom: '4px', letterSpacing: '1px' }}>
-          UNTUNG BERSIH
-        </p>
-        <h2 style={{ fontSize: '32px', fontWeight: 800, marginBottom: '16px' }}>
-          RM {toRM(Math.abs(netProfit))}
-          {netProfit < 0 && <span style={{ fontSize: '14px' }}> (rugi)</span>}
-        </h2>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <div style={{
-            flex: 1, background: 'rgba(255,255,255,0.15)',
-            borderRadius: '12px', padding: '10px'
-          }}>
-            <p style={{ fontSize: '10px', opacity: 0.7, marginBottom: '2px' }}>PENDAPATAN</p>
-            <p style={{ fontWeight: 700, fontSize: '15px' }}>RM {toRM(totalIncome)}</p>
-          </div>
-          <div style={{
-            flex: 1, background: 'rgba(255,255,255,0.15)',
-            borderRadius: '12px', padding: '10px'
-          }}>
-            <p style={{ fontSize: '10px', opacity: 0.7, marginBottom: '2px' }}>PERBELANJAAN</p>
-            <p style={{ fontWeight: 700, fontSize: '15px' }}>RM {toRM(totalExpense)}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent transactions */}
-      <div style={{ marginBottom: '16px' }}>
         <div style={{
-          display: 'flex', justifyContent: 'space-between',
-          alignItems: 'center', marginBottom: '10px'
+          width: '36px', height: '36px', borderRadius: '50%',
+          background: '#0d7a5f', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', fontSize: '16px', color: 'white',
+          fontWeight: 800
         }}>
-          <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#0f1f1a' }}>
-            TRANSAKSI TERKINI
-          </h3>
-          <Link href="/rekod" style={{
-            fontSize: '12px', color: '#0d7a5f',
-            fontWeight: 600, textDecoration: 'none'
+          {user.email?.[0].toUpperCase()}
+        </div>
+      </div>
+
+      {/* BENTO GRID */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+        {/* Hero card — Net Profit */}
+        <div style={{
+          background: isProfit
+            ? 'linear-gradient(135deg, #0d7a5f 0%, #0a5f4a 100%)'
+            : 'linear-gradient(135deg, #d94f3d 0%, #b03d2d 100%)',
+          borderRadius: '24px', padding: '24px',
+          color: 'white', position: 'relative', overflow: 'hidden'
+        }}>
+          {/* Background decoration */}
+          <div style={{
+            position: 'absolute', top: '-20px', right: '-20px',
+            width: '120px', height: '120px', borderRadius: '50%',
+            background: 'rgba(255,255,255,0.06)'
+          }} />
+          <div style={{
+            position: 'absolute', bottom: '-40px', right: '40px',
+            width: '160px', height: '160px', borderRadius: '50%',
+            background: 'rgba(255,255,255,0.04)'
+          }} />
+
+          <p style={{
+            fontSize: '10px', opacity: 0.7, letterSpacing: '2px',
+            textTransform: 'uppercase', marginBottom: '6px'
           }}>
-            Semua →
-          </Link>
+            UNTUNG BERSIH — {currentMonth}
+          </p>
+          <h2 style={{ fontSize: '36px', fontWeight: 900, marginBottom: '4px', letterSpacing: '-1px' }}>
+            RM {toRM(Math.abs(netProfit))}
+          </h2>
+          {!isProfit && (
+            <p style={{ fontSize: '12px', opacity: 0.8, marginBottom: '16px' }}>
+              ⚠️ Perbelanjaan melebihi pendapatan
+            </p>
+          )}
+          {isProfit && (
+            <p style={{ fontSize: '12px', opacity: 0.7, marginBottom: '16px' }}>
+              ✨ Tahniah! Perniagaan untung bulan ini
+            </p>
+          )}
+
+          {/* Income / Expense row */}
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{
+              flex: 1, background: 'rgba(255,255,255,0.12)',
+              borderRadius: '14px', padding: '12px'
+            }}>
+              <p style={{ fontSize: '9px', opacity: 0.7, marginBottom: '4px', letterSpacing: '1px' }}>
+                💰 PENDAPATAN
+              </p>
+              <p style={{ fontWeight: 800, fontSize: '16px' }}>
+                RM {toRM(totalIncome)}
+              </p>
+            </div>
+            <div style={{
+              flex: 1, background: 'rgba(255,255,255,0.12)',
+              borderRadius: '14px', padding: '12px'
+            }}>
+              <p style={{ fontSize: '9px', opacity: 0.7, marginBottom: '4px', letterSpacing: '1px' }}>
+                💸 PERBELANJAAN
+              </p>
+              <p style={{ fontWeight: 800, fontSize: '16px' }}>
+                RM {toRM(totalExpense)}
+              </p>
+            </div>
+          </div>
         </div>
 
-        {transactions.length === 0 ? (
+        {/* 2-col bento row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+
+          {/* Today's spending */}
           <div style={{
-            background: 'white', borderRadius: '16px', padding: '32px',
-            textAlign: 'center', color: '#666'
+            background: 'white', borderRadius: '20px',
+            padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
           }}>
-            <p style={{ fontSize: '32px', marginBottom: '8px' }}>📭</p>
-            <p style={{ fontSize: '13px', fontWeight: 600 }}>Tiada rekod lagi</p>
-            <p style={{ fontSize: '12px', marginTop: '4px' }}>
-              Tekan + untuk tambah perbelanjaan
+            <p style={{
+              fontSize: '9px', fontWeight: 700, color: '#888',
+              letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px'
+            }}>
+              📅 HARI INI
+            </p>
+            <p style={{ fontSize: '20px', fontWeight: 900, color: '#0f1f1a', marginBottom: '2px' }}>
+              RM {toRM(todaySpend)}
+            </p>
+            <p style={{ fontSize: '10px', color: '#888' }}>
+              {todayTransactions.length} transaksi
             </p>
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {transactions.map((tx: any) => (
-              <SwipeableTransaction key={tx.id} tx={tx} />
-            ))}
+
+          {/* Monthly transaction count */}
+          <div style={{
+            background: 'white', borderRadius: '20px',
+            padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
+          }}>
+            <p style={{
+              fontSize: '9px', fontWeight: 700, color: '#888',
+              letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px'
+            }}>
+              📆 BULAN INI
+            </p>
+            <p style={{ fontSize: '20px', fontWeight: 900, color: '#0f1f1a', marginBottom: '2px' }}>
+              {allTransactions.length}
+            </p>
+            <p style={{ fontSize: '10px', color: '#888' }}>
+              rekod disimpan
+            </p>
+          </div>
+        </div>
+
+        {/* Top spending category */}
+        {topCategory && (
+          <div style={{
+            background: 'white', borderRadius: '20px',
+            padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
+          }}>
+            <p style={{
+              fontSize: '9px', fontWeight: 700, color: '#888',
+              letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '12px'
+            }}>
+              🔥 PERBELANJAAN TERTINGGI
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '12px',
+                background: '#fdf0ee', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', fontSize: '20px', flexShrink: 0
+              }}>
+                {topCategory.icon}
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '13px', fontWeight: 800, color: '#0f1f1a' }}>
+                  {topCategory.name}
+                </p>
+                <p style={{ fontSize: '11px', color: '#888', marginTop: '1px' }}>
+                  {topCategoryPct}% daripada jumlah belanja
+                </p>
+              </div>
+              <p style={{ fontSize: '14px', fontWeight: 800, color: '#d94f3d' }}>
+                RM {toRM(topCategory.total)}
+              </p>
+            </div>
+            {/* Progress bar */}
+            <div style={{
+              height: '6px', background: '#f0f0f0',
+              borderRadius: '3px', overflow: 'hidden'
+            }}>
+              <div style={{
+                height: '100%', borderRadius: '3px',
+                width: `${topCategoryPct}%`,
+                background: 'linear-gradient(90deg, #d94f3d, #e8765f)',
+                transition: 'width 0.5s ease'
+              }} />
+            </div>
           </div>
         )}
+
+        {/* Recent transactions */}
+        <div>
+          <div style={{
+            display: 'flex', justifyContent: 'space-between',
+            alignItems: 'center', marginBottom: '10px', paddingTop: '4px'
+          }}>
+            <p style={{
+              fontSize: '10px', fontWeight: 700, color: '#888',
+              letterSpacing: '1px', textTransform: 'uppercase'
+            }}>
+              TRANSAKSI TERKINI
+            </p>
+            <Link href="/rekod" style={{
+              fontSize: '11px', color: '#0d7a5f',
+              fontWeight: 700, textDecoration: 'none'
+            }}>
+              Semua →
+            </Link>
+          </div>
+
+          {recentTransactions.length === 0 ? (
+            <div style={{
+              background: 'white', borderRadius: '20px', padding: '32px',
+              textAlign: 'center', color: '#666',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
+            }}>
+              <p style={{ fontSize: '36px', marginBottom: '8px' }}>📭</p>
+              <p style={{ fontSize: '13px', fontWeight: 600 }}>Tiada rekod lagi</p>
+              <p style={{ fontSize: '11px', marginTop: '4px', color: '#888' }}>
+                Tekan ➕ untuk tambah perbelanjaan pertama
+              </p>
+            </div>
+          ) : (
+            <div style={{
+              background: 'white', borderRadius: '20px', overflow: 'hidden',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
+            }}>
+{recentTransactions.map((tx: any, index: number) => (
+                <div key={tx.id} style={{
+                  borderBottom: index < recentTransactions.length - 1
+                    ? '1px solid #f0f0f0' : 'none',
+                  padding: '0 4px'
+                }}>
+                  <SwipeableTransaction tx={tx} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Quick action — Laporan */}
+        <Link href="/laporan" style={{ textDecoration: 'none' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+            borderRadius: '20px', padding: '16px',
+            display: 'flex', alignItems: 'center', gap: '14px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
+          }}>
+            <div style={{
+              width: '44px', height: '44px', borderRadius: '12px',
+              background: 'rgba(255,255,255,0.1)', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', fontSize: '22px'
+            }}>
+              📊
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: '13px', fontWeight: 800, color: 'white' }}>
+                Lihat Laporan Penuh
+              </p>
+              <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
+                Pecahan kategori & analisis bulan ini
+              </p>
+            </div>
+            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '18px' }}>›</span>
+          </div>
+        </Link>
+
       </div>
+
+      {/* FAB */}
+      <Link href="/tambah" style={{
+        position: 'fixed', bottom: '80px', right: '20px',
+        width: '56px', height: '56px', borderRadius: '50%',
+        background: 'linear-gradient(135deg, #0d7a5f, #0a5f4a)',
+        color: 'white', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', fontSize: '28px', fontWeight: 300,
+        textDecoration: 'none', zIndex: 20,
+        boxShadow: '0 4px 20px rgba(13,122,95,0.45)'
+      }}>
+        +
+      </Link>
 
       {/* Bottom nav */}
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0,
         background: 'white', borderTop: '1px solid #e8eeec',
-        display: 'flex', padding: '10px 0 20px', zIndex: 10
+        display: 'flex', padding: '10px 0',
+        paddingBottom: 'max(10px, env(safe-area-inset-bottom))',
+        zIndex: 10
       }}>
         {[
-          { href: '/dashboard', icon: '🏠', label: 'Utama', active: true },
+          { href: '/dashboard', icon: '🏠', label: 'Utama',   active: true },
           { href: '/tambah',    icon: '➕', label: 'Tambah' },
           { href: '/laporan',   icon: '📊', label: 'Laporan' },
           { href: '/tetapan',   icon: '⚙️', label: 'Tetapan' },
         ].map(item => (
           <Link key={item.href} href={item.href} style={{
             flex: 1, display: 'flex', flexDirection: 'column',
-            alignItems: 'center', gap: '3px', textDecoration: 'none',
+            alignItems: 'center', gap: '2px', textDecoration: 'none',
             color: item.active ? '#0d7a5f' : '#888'
           }}>
             <span style={{ fontSize: '20px' }}>{item.icon}</span>
-            <span style={{ fontSize: '10px', fontWeight: 700 }}>{item.label}</span>
+            <span style={{ fontSize: '9px', fontWeight: 700 }}>{item.label}</span>
           </Link>
         ))}
       </div>

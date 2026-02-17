@@ -70,7 +70,7 @@ export default function SwipeableTransaction({ tx }: { tx: Transaction }) {
   }
 
   return (
-    <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', marginBottom: '8px' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', marginBottom: '0' }}>
 
       {/* Delete button behind the row */}
       <div style={{
@@ -106,9 +106,9 @@ export default function SwipeableTransaction({ tx }: { tx: Transaction }) {
         style={{
           transform:  `translateX(${offset}px)`,
           transition: isDragging.current ? 'none' : 'transform 0.2s ease',
-          background: deleting ? '#fee2e2' : 'white',
-          borderRadius: '14px',
-          padding: '12px',
+background: deleting ? '#fee2e2' : 'white',
+          borderRadius: '0',
+          padding: '12px 16px',
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
