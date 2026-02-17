@@ -17,31 +17,34 @@ export default async function Dashboard() {
   const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
   const endDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
 
-  // 3. Load this month's transactions
-  const transactions = await prisma.transaction.findMany({
-    where: {
-      userId: user.id,
-      date: { gte: startDate, lte: endDate }
-    },
-    include: { category: true },
-    orderBy: { date: 'desc' },
-    take: 5
-  })
+// 3. Load ALL this month's transactions for correct totals
+const allTransactions = await prisma.transaction.findMany({
+  where: {
+    userId: user.id,
+    date: { gte: startDate, lte: endDate }
+  },
+  include: { category: true },
+  orderBy: { date: 'desc' },
+})
 
-  // 4. Calculate totals
-  let totalIncome  = 0
-  let totalExpense = 0
-  for (const tx of transactions) {
-    if (tx.type === 'INCOME') totalIncome  += tx.amount
-    else                       totalExpense += tx.amount
-  }
-  const netProfit = totalIncome - totalExpense
+// 4. Calculate totals from ALL transactions
+let totalIncome  = 0
+let totalExpense = 0
+for (const tx of allTransactions) {
+  if (tx.type === 'INCOME') totalIncome  += tx.amount
+  else                      totalExpense += tx.amount
+}
 
-  // 5. Format to RM
-  const toRM = (sen: number) => (sen / 100).toFixed(2)
+const netProfit = totalIncome - totalExpense
 
-  // 6. Month name in BM
-  const monthNames = [
+// 5. Only show 5 most recent on dashboard
+const transactions = allTransactions.slice(0, 5)
+
+// 6. Format to RM
+const toRM = (sen: number) => (sen / 100).toFixed(2)
+
+// 7. Month name in BM
+const monthNames = [
     'Januari','Februari','Mac','April','Mei','Jun',
     'Julai','Ogos','September','Oktober','November','Disember'
   ]
