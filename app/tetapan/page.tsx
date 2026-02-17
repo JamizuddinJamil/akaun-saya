@@ -12,7 +12,7 @@ export default async function TetapanPage() {
     <div style={{
       maxWidth: '430px', margin: '0 auto',
       padding: '0 16px 100px',
-      minHeight: '100vh', position: 'relative'
+      background: '#f5f7f6', minHeight: '100vh'
     }}>
       {/* Header */}
       <div style={{ padding: '20px 0 16px' }}>
@@ -26,6 +26,7 @@ export default async function TetapanPage() {
 
       {/* Menu items */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* Urus Kategori */}
         <Link href="/kategori" style={{ textDecoration: 'none' }}>
           <div style={{
             background: 'white', borderRadius: '14px',
@@ -40,10 +41,10 @@ export default async function TetapanPage() {
               🏷️
             </div>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0f1f1a', margin: 0 }}>
+              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0f1f1a' }}>
                 Urus Kategori
               </p>
-              <p style={{ fontSize: '11px', color: '#888', marginTop: '2px', margin: 0 }}>
+              <p style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
                 Tambah, edit atau padam kategori
               </p>
             </div>
@@ -51,11 +52,38 @@ export default async function TetapanPage() {
           </div>
         </Link>
 
-        {/* Client Component untuk Logout */}
+        {/* Panduan Pengguna */}
+        <Link href="/panduan" style={{ textDecoration: 'none' }}>
+          <div style={{
+            background: 'white', borderRadius: '14px',
+            padding: '16px', display: 'flex', alignItems: 'center',
+            gap: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+          }}>
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '10px',
+              background: '#e6f5f1', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', fontSize: '20px', flexShrink: 0
+            }}>
+              📖
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0f1f1a' }}>
+                Panduan Pengguna
+              </p>
+              <p style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
+                Cara guna aplikasi ini
+              </p>
+            </div>
+            <span style={{ color: '#ccc', fontSize: '18px' }}>›</span>
+          </div>
+        </Link>
+       
+        {/* Logout */}
         <LogoutButton />
+
       </div>
 
-      {/* App version - Sekarang berada di dalam container yang betul */}
+      {/* App version */}
       <p style={{
         textAlign: 'center', fontSize: '11px',
         color: '#ccc', marginTop: '32px'
@@ -67,26 +95,27 @@ export default async function TetapanPage() {
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0,
         background: 'white', borderTop: '1px solid #e8eeec',
-        display: 'flex', padding: '10px 0 20px', zIndex: 10,
-        // Tambahkan ini jika anda view di desktop supaya nav tak lebar sangat
-        maxWidth: '430px', margin: '0 auto' 
+        display: 'flex', padding: '10px 0',
+        paddingBottom: 'max(10px, env(safe-area-inset-bottom))',
+        zIndex: 10
       }}>
         {[
-{ href: '/dashboard', icon: '🏠', label: 'Utama' },
+          { href: '/dashboard', icon: '🏠', label: 'Utama' },
           { href: '/rekod',     icon: '📋', label: 'Rekod' },
           { href: '/laporan',   icon: '📊', label: 'Laporan' },
           { href: '/tetapan',   icon: '⚙️', label: 'Tetapan', active: true },
         ].map(item => (
           <Link key={item.href} href={item.href} style={{
             flex: 1, display: 'flex', flexDirection: 'column',
-            alignItems: 'center', gap: '3px', textDecoration: 'none',
+            alignItems: 'center', gap: '2px', textDecoration: 'none',
             color: item.active ? '#0d7a5f' : '#888'
           }}>
             <span style={{ fontSize: '20px' }}>{item.icon}</span>
-            <span style={{ fontSize: '10px', fontWeight: 700 }}>{item.label}</span>
+            <span style={{ fontSize: '9px', fontWeight: 700 }}>{item.label}</span>
           </Link>
         ))}
       </div>
+
     </div>
   )
 }
