@@ -342,32 +342,49 @@ export default async function Dashboard() {
           )}
         </div>
 
-        {/* Quick action — Laporan */}
-        <Link href="/laporan" style={{ textDecoration: 'none' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
-            borderRadius: '20px', padding: '16px',
-            display: 'flex', alignItems: 'center', gap: '14px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
-          }}>
-            <div style={{
-              width: '44px', height: '44px', borderRadius: '12px',
-              background: 'rgba(255,255,255,0.1)', display: 'flex',
-              alignItems: 'center', justifyContent: 'center', fontSize: '22px'
-            }}>
-              📊
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: '13px', fontWeight: 800, color: 'white' }}>
-                Lihat Laporan Penuh
-              </p>
-              <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
-                Pecahan kategori & analisis bulan ini
-              </p>
-            </div>
-            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '18px' }}>›</span>
-          </div>
-        </Link>
+{/* Business Health Bar — Minimalist Tracker */}
+<div style={{
+  background: 'white',
+  borderRadius: '20px',
+  padding: '16px',
+  boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+}}>
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '10px' }}>
+    <div>
+      <p style={{ fontSize: '9px', fontWeight: 700, color: '#888', letterSpacing: '1px', textTransform: 'uppercase' }}>
+        Jualan (Purata)
+      </p>
+      <p style={{ fontSize: '16px', fontWeight: 800, color: '#0f1f1a', marginTop: '2px' }}>
+        RM {toRM(totalIncome / now.getDate())} <span style={{ fontSize: '11px', fontWeight: 400, color: '#888' }}>/ hari</span>
+      </p>
+    </div>
+    <div style={{ textAlign: 'right' }}>
+      <p style={{ fontSize: '10px', fontWeight: 700, color: '#0d7a5f' }}>
+        Hari {now.getDate()} / {new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}
+      </p>
+    </div>
+  </div>
+
+  {/* Progress Bar (Time Progress) */}
+  <div style={{ 
+    height: '6px', 
+    background: '#f0f0f0', 
+    borderRadius: '10px', 
+    overflow: 'hidden' 
+  }}>
+    <div style={{
+      height: '100%',
+      width: `${(now.getDate() / new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()) * 100}%`,
+      background: 'linear-gradient(90deg, #0d7a5f, #2ecc71)',
+      borderRadius: '10px',
+      transition: 'width 1s ease'
+    }} />
+  </div>
+
+  <p style={{ fontSize: '10px', color: '#888', marginTop: '8px', fontStyle: 'italic' }}>
+    Target: Kekalkan purata untuk capai RM {toRM((totalIncome / now.getDate()) * new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate())} bulan ini.
+  </p>
+</div>
 
       </div>
 
