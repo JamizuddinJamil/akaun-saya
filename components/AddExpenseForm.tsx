@@ -116,63 +116,75 @@ export default function AddExpenseForm({ categories }: Props) {
           Resit (Pilihan)
         </p>
 
-        {receiptUrl ? (
-          // Receipt uploaded — show success state with replace options
-          <div style={{
-            background: '#e6f5f1', border: '1.5px solid #b2dfdb',
-            borderRadius: '16px', padding: '14px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '24px' }}>✅</span>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: '#0f1f1a' }}>
-                  Resit berjaya disimpan
-                </p>
-                <p style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>
-                  Nak tukar? Pilih semula di bawah
-                </p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => cameraRef.current?.click()}
-                disabled={uploading}
-                style={{
-                  flex: 1, padding: '8px', border: '1.5px solid #b2dfdb',
-                  borderRadius: '10px', background: 'white', cursor: 'pointer',
-                  fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif',
-                  color: '#0d7a5f', display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', gap: '4px'
-                }}
-              >
-                📷 Kamera
-              </button>
-              <button
-                onClick={() => galleryRef.current?.click()}
-                disabled={uploading}
-                style={{
-                  flex: 1, padding: '8px', border: '1.5px solid #b2dfdb',
-                  borderRadius: '10px', background: 'white', cursor: 'pointer',
-                  fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif',
-                  color: '#0d7a5f', display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', gap: '4px'
-                }}
-              >
-                🖼️ Galeri
-              </button>
-              <button
-                onClick={() => setReceiptUrl(null)}
-                style={{
-                  padding: '8px 12px', border: '1.5px solid #fca5a5',
-                  borderRadius: '10px', background: 'white', cursor: 'pointer',
-                  fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif',
-                  color: '#dc2626'
-                }}
-              >
-                🗑️
-              </button>
-            </div>
-          </div>
+{receiptUrl ? (
+  // Receipt uploaded — show thumbnail preview
+  <div style={{
+    background: 'white', border: '1.5px solid #b2dfdb',
+    borderRadius: '16px', overflow: 'hidden',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+  }}>
+    {/* Thumbnail */}
+    <div style={{ position: 'relative', width: '100%', height: '160px' }}>
+      <img
+        src={receiptUrl}
+        alt="Receipt preview"
+        style={{
+          width: '100%', height: '100%',
+          objectFit: 'cover'
+        }}
+      />
+      {/* Success badge */}
+      <div style={{
+        position: 'absolute', top: '8px', left: '8px',
+        background: '#0d7a5f', color: 'white',
+        borderRadius: '8px', padding: '4px 8px',
+        fontSize: '11px', fontWeight: 700,
+        display: 'flex', alignItems: 'center', gap: '4px'
+      }}>
+        ✅ Resit disimpan
+      </div>
+    </div>
+
+    {/* Action buttons */}
+    <div style={{ display: 'flex', gap: '8px', padding: '10px' }}>
+      <button
+        onClick={() => cameraRef.current?.click()}
+        disabled={uploading}
+        style={{
+          flex: 1, padding: '8px', border: '1.5px solid #e8eeec',
+          borderRadius: '10px', background: '#f9f9f9', cursor: 'pointer',
+          fontSize: '11px', fontWeight: 700, fontFamily: 'sans-serif',
+          color: '#666', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', gap: '4px'
+        }}
+      >
+        📷 Kamera
+      </button>
+      <button
+        onClick={() => galleryRef.current?.click()}
+        disabled={uploading}
+        style={{
+          flex: 1, padding: '8px', border: '1.5px solid #e8eeec',
+          borderRadius: '10px', background: '#f9f9f9', cursor: 'pointer',
+          fontSize: '11px', fontWeight: 700, fontFamily: 'sans-serif',
+          color: '#666', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', gap: '4px'
+        }}
+      >
+        🖼️ Galeri
+      </button>
+      <button
+        onClick={() => setReceiptUrl(null)}
+        style={{
+          padding: '8px 12px', border: '1.5px solid #fca5a5',
+          borderRadius: '10px', background: '#fff5f5', cursor: 'pointer',
+          fontSize: '14px', fontFamily: 'sans-serif',
+        }}
+      >
+        🗑️
+      </button>
+    </div>
+  </div>
         ) : (
           // No receipt — show two upload buttons
           <div style={{ display: 'flex', gap: '8px' }}>
