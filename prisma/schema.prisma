@@ -64,3 +64,4 @@ enum TransactionType {
   EXPENSE
   INCOME
 }
+
