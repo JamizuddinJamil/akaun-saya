@@ -4,21 +4,12 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
-const BUSINESS_TYPES = [
-  { value: 'catering',           label: '🍽️ Katering & Makanan' },
-  { value: 'car_rental',         label: '🚗 Sewa Kereta' },
-  { value: 'decoration_rental',  label: '🎨 Sewa Dekorasi & Peralatan' },
-  { value: 'retail',             label: '🏪 Kedai Runcit' },
-  { value: 'generic',            label: '➕ Lain-lain' },
-]
-
 export default function LoginPage() {
-  const [email,        setEmail]        = useState('')
-  const [password,     setPassword]     = useState('')
-  const [businessType, setBusinessType] = useState('generic')
-  const [loading,      setLoading]      = useState(false)
-  const [error,        setError]        = useState<string | null>(null)
-  const [mode,         setMode]         = useState<'login' | 'register'>('login')
+  const [email,    setEmail]    = useState('')
+  const [password, setPassword] = useState('')
+  const [loading,  setLoading]  = useState(false)
+  const [error,    setError]    = useState<string | null>(null)
+  const [mode,     setMode]     = useState<'login' | 'register'>('login')
 
   const supabase = createClient()
   const router   = useRouter()
@@ -31,13 +22,9 @@ export default function LoginPage() {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: { businessType }
-        }
       })
       
       if (signUpError) {
-        // Check if it's a duplicate email error
         if (signUpError.message.toLowerCase().includes('already') || 
             signUpError.message.toLowerCase().includes('exist')) {
           setError('Emel ini sudah didaftarkan. Sila log masuk.')
@@ -48,14 +35,13 @@ export default function LoginPage() {
         return
       }
 
-      // Supabase doesn't always throw error for duplicates, check if user was actually created
       if (data?.user && !data.user.identities?.length) {
         setError('Emel ini sudah didaftarkan. Sila log masuk.')
         setLoading(false)
         return
       }
 
-      setError('Semak emel anda untuk confirmation link!')
+      setError('✅ Semak emel anda untuk confirmation link!')
       setLoading(false)
       return
     }
@@ -91,35 +77,6 @@ export default function LoginPage() {
             {mode === 'login' ? 'Log masuk ke akaun anda' : 'Daftar akaun baru'}
           </p>
         </div>
-
-        {/* Business Type (register only) */}
-        {mode === 'register' && (
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{
-              display: 'block', fontSize: '12px', fontWeight: 700,
-              color: '#666', marginBottom: '8px', textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              Jenis Perniagaan
-            </label>
-            <select
-              value={businessType}
-              onChange={e => setBusinessType(e.target.value)}
-              style={{
-                width: '100%', padding: '12px 16px',
-                border: '2px solid #e8eeec', borderRadius: '12px',
-                fontSize: '14px', outline: 'none',
-                background: 'white', cursor: 'pointer'
-              }}
-            >
-              {BUSINESS_TYPES.map(type => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         {/* Email */}
         <div style={{ marginBottom: '16px' }}>
@@ -165,9 +122,9 @@ export default function LoginPage() {
         {/* Error */}
         {error && (
           <div style={{
-            background: error.includes('Semak') ? '#f0fdf4' : '#fdf0ee',
-            border: `1px solid ${error.includes('Semak') ? '#86efac' : '#fca5a5'}`,
-            color: error.includes('Semak') ? '#16a34a' : '#dc2626',
+            background: error.includes('✅') ? '#f0fdf4' : '#fdf0ee',
+            border: `1px solid ${error.includes('✅') ? '#86efac' : '#fca5a5'}`,
+            color: error.includes('✅') ? '#16a34a' : '#dc2626',
             padding: '12px', borderRadius: '10px',
             fontSize: '13px', marginBottom: '16px'
           }}>
@@ -184,8 +141,7 @@ export default function LoginPage() {
             background: loading ? '#9ca3af' : '#0d7a5f',
             color: 'white', border: 'none',
             borderRadius: '14px', fontSize: '15px',
-            fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer',
-            
+            fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer'
           }}
         >
           {loading ? '⏳ Tunggu...' : mode === 'login' ? 'Log Masuk' : 'Daftar'}

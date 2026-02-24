@@ -48,27 +48,36 @@ export default function KategoriClient({
     setError(null)
   }
 
-  async function saveEdit(id: string) {
+async function saveEdit(id: string) {
     if (!editName.trim()) { setError('Nama kategori diperlukan'); return }
     setLoading(true)
+    setError(null) // Good practice to clear previous errors
+    
     try {
       const res = await fetch(`/api/categories/${id}`, {
         method:  'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ name: editName.trim(), icon: editIcon })
       })
+      
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      if (!res.ok) throw new Error(data.error || 'Gagal mengemaskini kategori')
+      
       setEditing(null)
       router.refresh()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      // FIX: Replace 'any' with a type check
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Berlaku ralat yang tidak dijangka')
+      }
     } finally {
       setLoading(false)
     }
   }
 
-  // ── Delete category ────────────────────────────
+// ── Delete category ────────────────────────────
   async function deleteCategory(cat: Category) {
     if (cat._count.transactions > 0) {
       alert(`Kategori ini ada ${cat._count.transactions} transaksi. Tidak boleh dipadam.`)
@@ -80,34 +89,43 @@ export default function KategoriClient({
     try {
       const res = await fetch(`/api/categories/${cat.id}`, { method: 'DELETE' })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      
+      if (!res.ok) throw new Error(data.error || 'Gagal memadam kategori')
+      
       router.refresh()
-    } catch (err: any) {
-      alert(err.message)
+    } catch (err) {
+      // FIX: Replace 'any' with safety check
+      const message = err instanceof Error ? err.message : 'Berlaku ralat tidak dijangka'
+      alert(message)
     } finally {
       setLoading(false)
     }
   }
 
-  // ── Add category ───────────────────────────────
+// ── Add category ───────────────────────────────
   async function addCategory() {
     if (!newName.trim()) { setError('Nama kategori diperlukan'); return }
     setLoading(true)
     setError(null)
+    
     try {
       const res = await fetch('/api/categories', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ name: newName.trim(), icon: newIcon, type: tab })
       })
+      
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      if (!res.ok) throw new Error(data.error || 'Gagal menambah kategori baru')
+      
       setShowAdd(false)
       setNewName('')
       setNewIcon('📌')
       router.refresh()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      // FIX: Check if err is an Instance of Error to access .message safely
+      const message = err instanceof Error ? err.message : 'Berlaku ralat semasa menyimpan'
+      setError(message)
     } finally {
       setLoading(false)
     }

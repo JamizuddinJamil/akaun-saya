@@ -9,18 +9,22 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String        @id @default(cuid())
+  email        String        @unique
   name         String
   businessName String?
-  businessType String?  // Add this line
+  businessType String?
   phone        String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
+  onboardingCompleted Boolean   @default(false)
+  companyLogo         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
   categories   Category[]
   transactions Transaction[]
-
+  receivables  Receivable[]
+  
+  
   @@map("users")
 }
 
@@ -33,9 +37,10 @@ model Category {
   isDefault    Boolean         @default(false)
   sortOrder    Int             @default(0)
   createdAt    DateTime        @default(now())
+  
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
-
+  
   @@index([userId])
   @@map("categories")
 }
@@ -51,13 +56,37 @@ model Transaction {
   receiptUrl String?
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
-  category   Category        @relation(fields: [categoryId], references: [id])
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  
+  category    Category      @relation(fields: [categoryId], references: [id])
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  receivables Receivable[]
+  
   @@index([userId, date])
   @@index([userId, type])
   @@index([userId, categoryId])
   @@map("transactions")
+}
+
+model Receivable {
+  id            String    @id @default(cuid())
+  userId        String
+  customerName  String
+  phoneNumber   String?
+  amount        Int       // in sen
+  dueDate       DateTime?
+  status        String    @default("UNPAID")  // UNPAID, PAID
+  note          String?
+  createdAt     DateTime  @default(now())
+  paidAt        DateTime?
+  transactionId String?
+  
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction Transaction?  @relation(fields: [transactionId], references: [id])
+  
+  @@index([userId])
+  @@index([status])
+  @@index([userId, status])
+  @@map("receivables")
 }
 
 enum TransactionType {
@@ -65,3 +94,7 @@ enum TransactionType {
   INCOME
 }
 
+enum ReceivableStatus {
+  UNPAID
+  PAID
+}

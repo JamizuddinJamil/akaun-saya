@@ -27,7 +27,7 @@ export default function PanduanPage() {
             Panduan Pengguna
           </h1>
           <p style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
-            AkaunSaya.my v1.1.0
+            AkaunSaya.my v1.3.0
           </p>
         </div>
       </div>

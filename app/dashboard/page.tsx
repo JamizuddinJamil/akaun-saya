@@ -11,6 +11,27 @@ export default async function Dashboard() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // Check if user exists in database, create if not
+  let dbUser = await prisma.user.findUnique({
+    where: { id: user.id }
+  })
+  
+  if (!dbUser) {
+    // First time login - create user record
+    dbUser = await prisma.user.create({
+      data: {
+        id: user.id,
+        email: user.email!,
+        name: user.email!.split('@')[0],
+        onboardingCompleted: false,
+      }
+    })
+  }
+  
+  if (!dbUser.onboardingCompleted) {
+    redirect('/onboarding')
+  }
+
   const now       = new Date()
   const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
   const endDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
@@ -25,6 +46,15 @@ export default async function Dashboard() {
     include: { category: true },
     orderBy: { date: 'desc' },
   })
+
+  // Query unpaid receivables
+const unpaidReceivables = await prisma.receivable.findMany({
+  where: { userId: user.id, status: 'UNPAID' },
+  orderBy: { dueDate: 'asc' }
+})
+
+const totalReceivables = unpaidReceivables.reduce((sum, r) => sum + r.amount, 0)
+const overdueCount = unpaidReceivables.filter(r => r.dueDate && new Date(r.dueDate) < now).length
 
   // Today's transactions
   const todayTransactions = allTransactions.filter(tx =>
@@ -245,6 +275,66 @@ export default async function Dashboard() {
           </div>
         </div>
 
+        </div>
+
+        {/* Hutang Pelanggan card */}
+        <Link href="/hutang" style={{ textDecoration: 'none' }}>
+          <div style={{
+            background: totalReceivables === 0 ? 'white' : (overdueCount > 0 ? '#fef2f2' : '#fffbeb'),
+            border: totalReceivables === 0 ? '1.5px solid #e8eeec' : (overdueCount > 0 ? '1.5px solid #fca5a5' : '1.5px solid #fbbf24'),
+            borderRadius: '20px', padding: '16px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '12px',
+                background: totalReceivables === 0 ? '#f5f5f5' : (overdueCount > 0 ? '#fee2e2' : '#fef3c7'),
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '20px', flexShrink: 0
+              }}>
+                📋
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{
+                  fontSize: '10px', fontWeight: 700,
+                  color: totalReceivables === 0 ? '#888' : (overdueCount > 0 ? '#dc2626' : '#92400e'),
+                  letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px'
+                }}>
+                  HUTANG PELANGGAN
+                </p>
+                {totalReceivables === 0 ? (
+                  <p style={{ fontSize: '11px', color: '#888' }}>
+                    Tiada hutang 🎉
+                  </p>
+                ) : (
+                  <>
+                    <p style={{
+                      fontSize: '18px', fontWeight: 900,
+                      color: overdueCount > 0 ? '#dc2626' : '#92400e',
+                      marginBottom: '2px'
+                    }}>
+                      RM {toRM(totalReceivables)}
+                    </p>
+                    <p style={{ fontSize: '10px', color: '#888' }}>
+                      {unpaidReceivables.length} pelanggan
+                      {overdueCount > 0 && (
+                        <span style={{
+                          marginLeft: '6px', background: '#dc2626',
+                          color: 'white', padding: '2px 6px',
+                          borderRadius: '4px', fontSize: '9px', fontWeight: 700
+                        }}>
+                          {overdueCount} LEWAT
+                        </span>
+                      )}
+                    </p>
+                  </>
+                )}
+              </div>
+              <span style={{ color: '#ccc', fontSize: '18px' }}>›</span>
+            </div>
+          </div>
+        </Link>
+
         {/* Top spending category */}
         {topCategory && (
           <div style={{
@@ -340,31 +430,20 @@ export default async function Dashboard() {
               ))}
             </div>
           )}
+            
         </div>
 
-      </div>
-
-{/* FAB */}
+      {/* FAB */}
       <Link href="/tambah" style={{
         position: 'fixed', bottom: '80px', right: '20px',
         width: '56px', height: '56px', borderRadius: '50%',
         background: 'linear-gradient(135deg, #0d7a5f, #0a5f4a)',
-        color: 'white', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        zIndex: 20,
-        boxShadow: '0 4px 20px rgba(13,122,95,0.45)',
-        textDecoration: 'none',
+        color: 'white', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', fontSize: '28px', fontWeight: 300,
+        textDecoration: 'none', zIndex: 20,
+        boxShadow: '0 4px 20px rgba(13,122,95,0.45)'
       }}>
-        <span style={{ 
-          fontSize: '32px', 
-          fontWeight: '400', 
-          lineHeight: 1, 
-          marginTop: '-4px' // Tweak kecil untuk betulkan optik alignment
-        }}>
-          +
-        </span>
+        +
       </Link>
 
       {/* Bottom nav */}
@@ -376,7 +455,7 @@ export default async function Dashboard() {
         zIndex: 10
       }}>
         {[
-{ href: '/dashboard', icon: '🏠', label: 'Utama',   active: true },
+          { href: '/dashboard', icon: '🏠', label: 'Utama',   active: true },
           { href: '/rekod',     icon: '📋', label: 'Rekod' },
           { href: '/laporan',   icon: '📊', label: 'Laporan' },
           { href: '/tetapan',   icon: '⚙️', label: 'Tetapan' },

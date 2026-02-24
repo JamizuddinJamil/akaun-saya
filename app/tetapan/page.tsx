@@ -88,7 +88,7 @@ export default async function TetapanPage() {
         textAlign: 'center', fontSize: '11px',
         color: '#ccc', marginTop: '32px'
       }}>
-        AkaunSaya.my v1.1.0
+        AkaunSaya.my v1.3.0
       </p>
 
       {/* Bottom nav */}
