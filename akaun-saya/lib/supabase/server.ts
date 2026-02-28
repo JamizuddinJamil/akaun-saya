@@ -1,5 +1,4 @@
-// lib/supabase/client.ts
-<<<<<<< HEAD
+// lib/supabase/server.ts
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 export const createClient = () => {
@@ -13,15 +12,3 @@ export const createClient = () => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   )
 }
-=======
-// Use this in CLIENT components ('use client')
-
-import { createBrowserClient } from '@supabase/ssr'
-
-export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
->>>>>>> 7c1e94a5505df763b777fa26d0b7c34c7b821e8f

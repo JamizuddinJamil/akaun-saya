@@ -1,15 +1,10 @@
-<<<<<<< HEAD
 // app/layout.tsx
 import type { Metadata } from 'next'
-=======
-import type { Metadata, Viewport } from 'next'
->>>>>>> 7c1e94a5505df763b777fa26d0b7c34c7b821e8f
 import './globals.css'
 
 export const metadata: Metadata = {
   title: 'AkaunSaya.my — Rekod Perbelanjaan Saya',
   description: 'Aplikasi rekod perbelanjaan untuk pelbagai perniagaan',
-<<<<<<< HEAD
   viewport: {
     width: 'device-width',
     initialScale: 1,
@@ -26,15 +21,6 @@ export const metadata: Metadata = {
     { rel: 'icon', url: '/favicon.svg', type: 'image/svg+xml' },
     { rel: 'apple-touch-icon', url: '/apple-touch-icon.png' }, // iOS
   ],
-=======
-}
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
->>>>>>> 7c1e94a5505df763b777fa26d0b7c34c7b821e8f
 }
 
 export default function RootLayout({
@@ -44,7 +30,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ms">
-<<<<<<< HEAD
       <body
         style={{
           margin: 0,
@@ -54,26 +39,8 @@ export default function RootLayout({
           WebkitTextSizeAdjust: '100%',
         }}
       >
-=======
-      <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="theme-color" content="#0d7a5f" />
-      </head>
-      <body style={{
-        margin: 0,
-        padding: 0,
-        background: '#f5f7f6',
-        WebkitTapHighlightColor: 'transparent',
-        WebkitTextSizeAdjust: '100%',
-      }}>
->>>>>>> 7c1e94a5505df763b777fa26d0b7c34c7b821e8f
         {children}
       </body>
     </html>
   )
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 7c1e94a5505df763b777fa26d0b7c34c7b821e8f

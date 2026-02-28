@@ -77,7 +77,6 @@ export default async function TetapanPage() {
             <span style={{ color: '#ccc', fontSize: '18px' }}>›</span>
           </div>
         </Link>
-<<<<<<< HEAD
 
         {/* Edit Akaun Saya */}
 <Link href="/akaun" style={{ textDecoration: 'none' }}>
@@ -104,8 +103,6 @@ export default async function TetapanPage() {
     <span style={{ color: '#ccc', fontSize: '18px' }}>›</span>
   </div>
 </Link>
-=======
->>>>>>> 7c1e94a5505df763b777fa26d0b7c34c7b821e8f
        
         {/* Logout */}
         <LogoutButton />
