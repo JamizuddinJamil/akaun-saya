@@ -5,20 +5,20 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 
 export async function deleteUserAction() {
-  const supabase = createClient()
+  const supabase = await createClient()
+  
+  // 1. Sahkan user memang tengah log masuk
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Tidak sah")
 
-  // 1. Verify user is logged in
-  const { data: { user }, error: getUserError } = await supabase.auth.getUser()
-  if (getUserError || !user) throw new Error("Tidak sah")
-
-  // 2. Use Admin Client to delete from Auth
+  // 2. Gunakan Admin Client untuk padam dari Auth
   const adminClient = createAdminClient()
-  const { error: adminError } = await adminClient.auth.admin.deleteUser(user.id)
-  if (adminError) throw adminError
+  const { error } = await adminClient.auth.admin.deleteUser(user.id)
+  
+  if (error) throw error
 
-  // 3. Log out
+  // 3. Log keluar (buang cookies)
   await supabase.auth.signOut()
-
-  // 4. Redirect to login
+  
   redirect('/login')
 }

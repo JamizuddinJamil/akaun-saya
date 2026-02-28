@@ -33,7 +33,6 @@ export default async function ReceivableDetailPage({
   const isOverdue = receivable.dueDate && new Date(receivable.dueDate) < now
   const isPaid = receivable.status === 'PAID'
 
-<<<<<<< HEAD
 // WhatsApp link
 const whatsappLink = receivable.phoneNumber
   ? (() => {
@@ -54,14 +53,6 @@ const whatsappLink = receivable.phoneNumber
       )}`
     })()
   : null
-=======
-  // WhatsApp link
-  const whatsappLink = receivable.phoneNumber
-    ? `https://wa.me/${receivable.phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-        `Assalamualaikum ${receivable.customerName}, ini peringatan untuk bayaran RM ${toRM(receivable.amount)}. Terima kasih.`
-      )}`
-    : null
->>>>>>> 7c1e94a5505df763b777fa26d0b7c34c7b821e8f
 
   return (
     <div style={{

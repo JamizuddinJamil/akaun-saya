@@ -55,7 +55,6 @@
           ))}
         </div>
 
-<<<<<<< HEAD
         {/* Hutang Pelanggan skeleton */}
       <div style={{  
         borderRadius: '20px', height: '80px', 
@@ -65,8 +64,6 @@
       }} />
 
 
-=======
->>>>>>> 7c1e94a5505df763b777fa26d0b7c34c7b821e8f
         {/* Top category skeleton */}
         <div style={{
           borderRadius: '20px', height: '100px',
