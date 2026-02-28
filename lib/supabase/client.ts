@@ -1,11 +1,9 @@
 // lib/supabase/client.ts
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient, SupabaseClient } from '@supabase/supabase-js'
 
-export const createClient = () => {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL)
-    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL')
-  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-    throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY')
+export const createClient = (): SupabaseClient => {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL')
+  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
   return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
