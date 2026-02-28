@@ -126,6 +126,7 @@ const overdueCount = unpaidReceivables.filter(r => r.dueDate && new Date(r.dueDa
             {currentMonth}
           </p>
         </div>
+
         <div style={{
           width: '36px', height: '36px', borderRadius: '50%',
           background: '#0d7a5f', display: 'flex', alignItems: 'center',

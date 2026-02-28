@@ -77,6 +77,32 @@ export default async function TetapanPage() {
             <span style={{ color: '#ccc', fontSize: '18px' }}>›</span>
           </div>
         </Link>
+
+        {/* Edit Akaun Saya */}
+<Link href="/akaun" style={{ textDecoration: 'none' }}>
+  <div style={{
+    background: 'white', borderRadius: '14px',
+    padding: '16px', display: 'flex', alignItems: 'center',
+    gap: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+  }}>
+    <div style={{
+      width: '40px', height: '40px', borderRadius: '10px',
+      background: '#e6f5f1', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', fontSize: '20px', flexShrink: 0
+    }}>
+      📝
+    </div>
+    <div style={{ flex: 1 }}>
+      <p style={{ fontSize: '13px', fontWeight: 700, color: '#0f1f1a' }}>
+        Edit Akaun Saya
+      </p>
+      <p style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
+        Email atau padam akaun 
+      </p>
+    </div>
+    <span style={{ color: '#ccc', fontSize: '18px' }}>›</span>
+  </div>
+</Link>
        
         {/* Logout */}
         <LogoutButton />
