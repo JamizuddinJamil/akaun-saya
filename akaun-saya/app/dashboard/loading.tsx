@@ -55,6 +55,15 @@
           ))}
         </div>
 
+        {/* Hutang Pelanggan skeleton */}
+      <div style={{  
+        borderRadius: '20px', height: '80px', 
+        background: 'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)',
+        backgroundSize: '200% 100%',
+        animation: 'shimmer 1.5s infinite' 
+      }} />
+
+
         {/* Top category skeleton */}
         <div style={{
           borderRadius: '20px', height: '100px',
