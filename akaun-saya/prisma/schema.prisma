@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  businessName String?
+  businessType String?
+  phone        String?
+  onboardingCompleted Boolean   @default(false)
+  companyLogo         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  categories   Category[]
+  transactions Transaction[]
+  receivables  Receivable[]
+  
+  
+  @@map("users")
+}
+
+model Category {
+  id           String          @id @default(cuid())
+  userId       String
+  name         String
+  icon         String
+  type         TransactionType
+  isDefault    Boolean         @default(false)
+  sortOrder    Int             @default(0)
+  createdAt    DateTime        @default(now())
+  
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  
+  @@index([userId])
+  @@map("categories")
+}
+
+model Transaction {
+  id         String          @id @default(cuid())
+  userId     String
+  categoryId String
+  type       TransactionType
+  amount     Int
+  date       DateTime
+  note       String?
+  receiptUrl String?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  
+  category    Category      @relation(fields: [categoryId], references: [id])
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  receivables Receivable[]
+  
+  @@index([userId, date])
+  @@index([userId, type])
+  @@index([userId, categoryId])
+  @@map("transactions")
+}
+
+model Receivable {
+  id            String    @id @default(cuid())
+  userId        String
+  customerName  String
+  phoneNumber   String?
+  amount        Int       // in sen
+  dueDate       DateTime?
+  status        String    @default("UNPAID")  // UNPAID, PAID
+  note          String?
+  createdAt     DateTime  @default(now())
+  paidAt        DateTime?
+  transactionId String?
+  
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction Transaction?  @relation(fields: [transactionId], references: [id])
+  
+  @@index([userId])
+  @@index([status])
+  @@index([userId, status])
+  @@map("receivables")
+}
+
+enum TransactionType {
+  EXPENSE
+  INCOME
+}
+
+enum ReceivableStatus {
+  UNPAID
+  PAID
+}
